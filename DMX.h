@@ -29,6 +29,8 @@ extern "C" {
 #define DMX_TXEN_PIN		BIT_6
 #define DMX_UART                UART3
 #define DMX_UART_STABITS        U3STAbits
+#define DMX_UART_TX_PORT        IOPORT_G
+#define DMX_UART_TX_PIN         BIT_8
 #endif
 
 extern short dmx_channel;

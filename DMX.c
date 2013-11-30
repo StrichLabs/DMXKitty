@@ -9,6 +9,9 @@ short dmx_channel;
 BYTE dmx_break_rx;
 
 void DMXPortInit(void) {
+    // we manually twiddle this pin for the long BREAKs
+    PORTSetPinsDigitalOut(DMX_UART_TX_PORT, DMX_UART_TX_PIN);
+
     UARTConfigure(DMX_UART, UART_ENABLE_PINS_TX_RX_ONLY);
     UARTSetFifoMode(DMX_UART, UART_INTERRUPT_ON_TX_NOT_FULL | UART_INTERRUPT_ON_RX_NOT_EMPTY);
     UARTSetLineControl(DMX_UART, UART_DATA_SIZE_8_BITS | UART_PARITY_NONE | UART_STOP_BITS_2);
@@ -63,6 +66,18 @@ void DMXReceiveInit(void) {
     INTEnable(INT_U3RX, INT_ENABLED);
 }
 
+void DMXSendBreak(void) {
+    long i;
+    
+    // BREAK
+    UARTEnable(DMX_UART, UART_DISABLE_FLAGS(UART_PERIPHERAL | UART_RX | UART_TX));
+    PORTClearBits(DMX_UART_TX_PORT, DMX_UART_TX_PIN);
+    for(i=0; i<7000; i++);
+
+    // MAB is automatic during the re-enabling of the UART
+    UARTEnable(DMX_UART, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_RX | UART_TX));
+}
+
 void DMXSendTask(void) {
     if(!UARTTransmissionHasCompleted(DMX_UART)) return;
     UARTSendDataByte(DMX_UART, dmx_buffer[dmx_channel++]);
@@ -70,15 +85,9 @@ void DMXSendTask(void) {
     if(dmx_channel == 512) {
         while(!UARTTransmissionHasCompleted(DMX_UART));
         // entire universe sent, send the BREAK
-        dmx_channel = 0;
-        UARTSetDataRate(DMX_UART, 80000000, 100000);
-        UARTSendBreak(DMX_UART);
-        while(!UARTTransmissionHasCompleted(DMX_UART));
-        //BYTE i;
-        //for(i=0; i<30; i++);    // MAB
-        UARTSetDataRate(DMX_UART, 80000000, 250000);
+        DMXSendBreak();
+        dmx_channel = 1;    // FIXME: we should have to start at 0 for the SC
     }
-
 }
 
 

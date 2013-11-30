@@ -5,7 +5,7 @@
  * Created on March 15, 2013, 1915
 \*/
 
-#define FIRMWARE_VERSION    1
+#define FIRMWARE_VERSION    2
 #define THIS_IS_STACK_APPLICATION
 #define ESTA_MFG_CODE 0x03AF
 
@@ -230,7 +230,7 @@ void OutputArtNetTask(void) {
     DmxPacket.Net = 0;
     DmxPacket.LengthHi = 0;
     DmxPacket.LengthLo = 255;
-    memcpy(DmxPacket.Data, dmx_buffer+2, 255);  // +1 to skip the Start Code, +1 to skip something <_<
+    memcpy(DmxPacket.Data, dmx_buffer+1, 255);  // +1 to skip the Start Code
     UdpSender = UDPOpenEx((int)NULL, UDP_OPEN_NODE_INFO, 6454, 6454);
     UDPIsPutReady(UdpSender);
     UDPPutArray(&DmxPacket, sizeof(struct ArtDmx));
