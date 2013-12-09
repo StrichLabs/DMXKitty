@@ -5,7 +5,7 @@
  * Created on March 15, 2013, 1915
 \*/
 
-#define FIRMWARE_VERSION    2
+#define FIRMWARE_VERSION    3
 #define THIS_IS_STACK_APPLICATION
 #define ESTA_MFG_CODE 0x03AF
 
@@ -204,7 +204,6 @@ void InputArtNetTask(void) {
             case OpDmx:
                 LastTraffic = 0;
                 Universe = InPacketBuffer[14];
-                DelayMs(1); // FIXME: just here for debugging
                 DmxBuffer = OpCode+5;
                 DmxBuffer -= 2;
                 *DmxBuffer = 0x00;
