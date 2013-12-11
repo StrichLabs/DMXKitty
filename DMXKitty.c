@@ -5,7 +5,7 @@
  * Created on March 15, 2013, 1915
 \*/
 
-#define FIRMWARE_VERSION    3
+#define FIRMWARE_VERSION    4
 #define THIS_IS_STACK_APPLICATION
 #define ESTA_MFG_CODE 0x03AF
 
@@ -222,14 +222,15 @@ void OutputArtNetTask(void) {
 
     strcpy(DmxPacket.ID, "Art-Net");
     DmxPacket.OpCode = OpDmx;
-    DmxPacket.ProtVer = 14;
+    DmxPacket.ProtVerHi = 0;
+    DmxPacket.ProtVerLo = 14;
     DmxPacket.Sequence = 0;
     DmxPacket.Physical = 0;
     DmxPacket.SubUni = SUBUNI;
     DmxPacket.Net = 0;
-    DmxPacket.LengthHi = 0;
-    DmxPacket.LengthLo = 255;
-    memcpy(DmxPacket.Data, dmx_buffer+1, 255);  // +1 to skip the Start Code
+    DmxPacket.LengthHi = ((512 >> 8) & 0xFF); // FIXME: don't hardcode 512 here and below
+    DmxPacket.LengthLo = (512 & 0xFF);
+    memcpy(DmxPacket.Data, dmx_buffer+1, 512);  // +1 to skip the Start Code
     UdpSender = UDPOpenEx((int)NULL, UDP_OPEN_NODE_INFO, 6454, 6454);
     UDPIsPutReady(UdpSender);
     UDPPutArray(&DmxPacket, sizeof(struct ArtDmx));
