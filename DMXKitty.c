@@ -5,7 +5,7 @@
  * Created on March 15, 2013, 1915
 \*/
 
-#define FIRMWARE_VERSION    4
+#define FIRMWARE_VERSION    5
 #define THIS_IS_STACK_APPLICATION
 #define ESTA_MFG_CODE 0x03AF
 
@@ -205,8 +205,7 @@ void InputArtNetTask(void) {
                 LastTraffic = 0;
                 Universe = InPacketBuffer[14];
                 DmxBuffer = OpCode+5;
-                DmxBuffer -= 2;
-                *DmxBuffer = 0x00;
+                DmxBuffer -= 1;
                 memcpy(dmx_buffer, DmxBuffer, 512);     // naming :|
                 // FIXME: remove 512 hardcodedness
                 break;
