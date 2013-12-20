@@ -80,13 +80,18 @@ void DMXSendBreak(void) {
 
 void DMXSendTask(void) {
     if(!UARTTransmissionHasCompleted(DMX_UART)) return;
-    UARTSendDataByte(DMX_UART, dmx_buffer[dmx_channel++]);
+    if(dmx_channel == 0) {
+        UARTSendDataByte(DMX_UART, 0x00);  // Start Code
+        dmx_channel++;
+    } else {
+        UARTSendDataByte(DMX_UART, dmx_buffer[dmx_channel++]);
+    }
 
     if(dmx_channel == 512) {
         while(!UARTTransmissionHasCompleted(DMX_UART));
         // entire universe sent, send the BREAK
         DMXSendBreak();
-        dmx_channel = 1;    // FIXME: we should have to start at 0 for the SC
+        dmx_channel = 0;    // FIXME: we should have to start at 0 for the SC
     }
 }
 
